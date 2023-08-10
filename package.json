@@ -1,6 +1,6 @@
 {
   "name": "spcr-config",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Settings module for Spicetify Creator plugins inspired by spcr-settings",
   "main": "index.ts",
   "repository": "github:Aimarekin/spicetify-creator-plugins",
