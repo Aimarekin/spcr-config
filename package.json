@@ -1,0 +1,13 @@
+{
+  "name": "spcr-configuration",
+  "version": "1.0.0",
+  "description": "Settings module for Spicetify Creator plugins inspired by spcr-settings",
+  "main": "settings.ts",
+  "repository": "github:Aimarekin/spicetify-creator-plugins",
+  "author": "Aimarekin",
+  "license": "CC-BY-NC-4.0",
+  "devDependencies": {
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2"
+  }
+}
