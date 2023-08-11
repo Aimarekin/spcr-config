@@ -1,10 +1,8 @@
-
-
-export default function ExtensionHeader(props: { extensionName: string, extensionVersion?: string, extensionLink?: string }) {
+export default function ExtensionHeader(props: { name: React.ReactNode, version?: React.ReactNode, link?: string }) {
     return (
     <div className="x-settings-headerContainer">
-        <h1>{props.extensionLink ? <a href={props.extensionLink}>{props.extensionName}</a> : props.extensionName }</h1>
-        {props.extensionVersion && <span>Version {props.extensionVersion}</span>}
+        <h1>{props.link ? <a href={props.link}>{props.name}</a> : props.name }</h1>
+        {props.version && <span>Version {props.version}</span>}
     </div>
     )
 }

@@ -1,6 +1,8 @@
+import ConfigField from "./configControllers/configFields/ConfigField";
+
 type Arrayable<T> = T | T[];
 
-export function pushToSettings(elements: Arrayable< React.ReactNode | ConfigField<any> > ): () => void {
+export default function pushSettings(elements: Arrayable< React.ReactNode | ConfigField<any> > ): () => void {
     function adapt(elm: React.ReactNode | ConfigField<any>): React.ReactNode {
         return elm instanceof ConfigField ? elm.Render() : elm;
     }
@@ -32,7 +34,7 @@ export function pushToSettings(elements: Arrayable< React.ReactNode | ConfigFiel
         startObserver();
     }
 
-    const removeHistoryListener = Spicetify.Platform.History.listen((location) => {
+    const removeHistoryListener = Spicetify.Platform.History.listen((location: any) => {
         if (location.pathname !== "/preferences") {
             settingsContainer.remove();
             return

@@ -1,6 +1,6 @@
 import RevertIcon from "../icons/RevertIcon";
 
-export default function RevertButton(props: {onClick: () => void}) {
+export default function RevertButton(props: {onClick: React.DOMAttributes<HTMLButtonElement>["onClick"]}) {
     return (
         <Spicetify.ReactComponent.TooltipWrapper
             label = {Spicetify.Locale.getDictionary()?.["equalizer.reset"] || "Reset"}

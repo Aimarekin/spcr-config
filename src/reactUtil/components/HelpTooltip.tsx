@@ -1,6 +1,6 @@
 import HelpIcon from "../icons/HelpIcon"
 
-export default function HelpTooltip(props: {text: string}) {
+export default function HelpTooltip(props: {text: React.ReactNode}) {
     return (
         <div className="x-settings-tooltip">
             <Spicetify.ReactComponent.TooltipWrapper
