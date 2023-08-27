@@ -1,8 +1,17 @@
-export default function ConfigHeader(props: React.PropsWithChildren<{ text?: React.ReactNode }>) {
+import { getReact, getSpicetifyReactComponent } from "../reactLoader"
+
+export type ConfigHeaderProps = React.PropsWithChildren<{}>
+
+export default function ConfigHeader(props: ConfigHeaderProps) {
+    const React = getReact(), ReactComponent = getSpicetifyReactComponent();
+
     return (
-    <div className="x-settings-section">
-        {props.text !== undefined && <h2>{props.text}</h2>}
-        {props.children}
-    </div>
+        <ReactComponent.TextComponent
+            as="h2"
+            semanticColor="textBase"
+            variant="cello"
+        >
+            {props.children}
+        </ReactComponent.TextComponent>
     )
 }

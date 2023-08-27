@@ -1,17 +1,13 @@
 {
-    "compilerOptions": {
-      "target": "ES2016",
-      "lib": ["ES2016", "DOM"],
-      "outDir": "dist",
-      "rootDir": "src",
-      "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
-      "strict": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "jsx": "react",
-      "jsxFactory": "Spicetify.React.createElement",
-      "jsxFragmentFactory": "Spicetify.React.createFragment"
-    },
-    "include": [ "src/**/*" ]
-  }
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2015",
+    "lib": ["ES2015", "DOM"],
+    "outDir": "dist",
+    "declaration": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "jsx": "react",
+  },
+  "include": [ "src/**/*" ]
+}

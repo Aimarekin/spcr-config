@@ -1,13 +1,14 @@
-import { spicetifyReady } from "../util/spicetifyLoader";
-import { isNamespaceRegistered, registerNamespace, unregisterNamespace } from "../util/namespaceRegistry";
+import { isNamespaceRegistered, registerNamespace } from "../util/namespaceRegistry";
+
+import NamespaceRegisteredError from "../util/errors/NamespaceRegisteredError";
+
+import throwIfSpicetifyNotReady from "../util/throwIfSpicetifyNotReady";
 
 import ConfigSocket from "./ConfigSocket";
-import ConfigFieldToggle from "./configFields/ConfigFieldToggle";
-import ConfigFieldText from "./configFields/ConfigFieldText";
-import ConfigFieldNumber from "./configFields/ConfigFieldNumber";
-import ConfigFieldDropdown from "./configFields/ConfigFieldDropdown";
-
-import { ConfigFieldToggleProps, ConfigFieldTextProps, ConfigFieldNumberProps, ConfigFieldDropdownProps } from "./ConfigProps";
+import ConfigFieldToggle, { ConfigFieldToggleProps } from "./configFields/ConfigFieldToggle";
+import ConfigFieldText, { ConfigFieldTextProps } from "./configFields/ConfigFieldText";
+import ConfigFieldNumber, { ConfigFieldNumberProps } from "./configFields/ConfigFieldNumber";
+import ConfigFieldDropdown, { ConfigFieldDropdownProps } from "./configFields/ConfigFieldDropdown";
 
 type StoredConfig = {
     migrationIndex?: number,
@@ -15,33 +16,45 @@ type StoredConfig = {
 };
 
 export default class ConfigNamespace {
-    private _data: StoredConfig | null;
-    _closed: boolean = false;
-    private _closeConnection: () => void;
+    private _data: StoredConfig | null = null;
+    private _hasLoaded = false;
+    private _hasBeenModified = false;
     migrationIndex: number | null;
     activeSockets: Record<string, ConfigSocket> = {};
 
     constructor (
         public readonly id: string,
-        migrations?: ((records: StoredConfig["records"]) => StoredConfig["records"])[]
+        public readonly migrations?: ((records: StoredConfig["records"]) => StoredConfig["records"])[]
     ) {
-        if (!spicetifyReady) {
-            throw new Error("Spicetify is not ready! Please wait for spicetifyReady to be true before creating a ConfigNamespace. The async function waitForSpicetify() will resolve once it is.");
-        }
         if (isNamespaceRegistered(id)) {
-            throw new Error(`ConfigNamespace with id ${id} already exists! Extension might have duplicate instances.`);
+            throw new NamespaceRegisteredError(id);
         }
 
         registerNamespace(id);
         this.migrationIndex = migrations?.length ?? null;
+    }
 
-        this._closeConnection = this.saveToStorage.bind(this);
-        window.addEventListener("beforeunload", this._closeConnection);
+    get hasLoaded(): boolean {
+        return this._hasLoaded;
+    }
+
+    get hasBeenModified(): boolean {
+        return this._hasBeenModified;
+    }
+
+    forceLoad(): boolean {
+        if (this.hasLoaded) {
+            return false;
+        }
+        throwIfSpicetifyNotReady("Accessing and modifying data requires Spicetify to be loaded.");
+
+        this._hasLoaded = true;
+        window.addEventListener("beforeunload", () => this.saveToStorage());
 
         const stored = Spicetify.LocalStorage.get(this.id);
         if (stored === null) {
             this._data = null;
-            return
+            return true;
         }
 
         let storedParsed: StoredConfig | null = null;
@@ -53,32 +66,24 @@ export default class ConfigNamespace {
         if (storedParsed === null || typeof storedParsed !== "object") {
             console.error(`Failed to parse config namespace ${this.id}!`);
             this._data = null;
-            return;
+            return true;
         }
 
         if (this.migrationIndex !== null) {
             for (let i = storedParsed.migrationIndex ?? -1; i < this.migrationIndex; i++) {
-                storedParsed.records = migrations![i + 1](storedParsed.records);
+                storedParsed.records = this.migrations![i + 1](storedParsed.records);
             }
             storedParsed.migrationIndex = this.migrationIndex;
         }
         
         this._data = storedParsed;
+
+        return true;
     }
 
-    close() {
-        if (this._closed) {
-            throw new Error(`ConfigNamespace ${this.id} is already closed!`);
-        }
-        window.removeEventListener("beforeunload", this._closeConnection);
-        this.saveToStorage();
-        unregisterNamespace(this.id);
-    }
-
-    saveToStorage() {
-        if (this._closed) {
-            throw new Error(`ConfigNamespace ${this.id} is closed and cannot be used!`);
-        }
+    saveToStorage(forced: boolean = false) {
+        if (!this.hasLoaded) this.forceLoad();
+        if (!this.hasBeenModified && !forced) return;
 
         if (this._data === null || Object.keys(this._data.records).length === 0) {
             Spicetify.LocalStorage.remove(this.id);
@@ -89,39 +94,39 @@ export default class ConfigNamespace {
     }
 
     _getStored(field: string): any | undefined {
-        if (this._closed) {
-            throw new Error(`ConfigNamespace ${this.id} is closed and cannot be used!`);
-        }
+        this.forceLoad();
 
         if (this._data === null) {
             return undefined;
         }
+
         return this._data.records[field];
     }
 
     _setStored(field: string, value: any | undefined) {
-        if (this._closed) {
-            throw new Error(`ConfigNamespace ${this.id} is closed and cannot be used!`);
-        }
+        this.forceLoad();
 
         if (value === undefined) {
             this._clearStored(field);
             return;
         }
+
         if (this._data === null) {
             this._data = { records: {} };
         }
+
+        this._hasBeenModified = true;
         this._data.records[field] = value;
     }
 
     _clearStored(id: string) {
-        if (this._closed) {
-            throw new Error(`ConfigNamespace ${this.id} is closed and cannot be used!`);
-        }
-        
+        this.forceLoad();
+
         if (this._data === null) {
             return;
         }
+
+        this._hasBeenModified = true;
         delete this._data.records[id];
     }
 

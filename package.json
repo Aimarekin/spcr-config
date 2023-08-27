@@ -1,31 +1,29 @@
 {
   "name": "spcr-config",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Settings module for Spicetify Creator plugins inspired by spcr-settings",
   "license": "CC-BY-NC-4.0",
   "author": "Aimarekin <aimarekin@gmail.com>",
-  "repository": "github:Aimarekin/spicetify-creator-plugins",
+  "repository": "github:Aimarekin/spcr-config",
   "private": false,
   "publishConfig": {
     "access": "public"
   },
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist/"
   ],
   "scripts": {
-    "build": "rollup -c config/rollup.config.mjs"
+    "build": "tsc"
   },
   "devDependencies": {
-    "@babel/plugin-transform-typescript": "^7.22.10",
-    "@babel/preset-env": "^7.22.10",
-    "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-typescript": "^11.1.2",
+    "@types/node": "^20.4.10",
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.2",
-    "glob": "^10.3.3",
-    "rollup": "^3.28.0",
-    "tslib": "^2.6.1"
+    "csstype": "^3.1.2",
+    "eslint": "8.48.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-prettier": "5.0.0",
+    "prettier": "3.0.2"
   }
 }

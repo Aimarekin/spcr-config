@@ -1,19 +1,21 @@
-import HelpTooltip from "./HelpTooltip";
-import RevertButton from "./RevertButton";
+import { getReact } from "../reactLoader"
 
-import { ConfigRowProps } from "./ComponentProps";
+export type ConfigRowProps = {
+    firstColumn?: React.ReactNode
+    secondColumn?: React.ReactNode
+}
 
-export default function ConfigRow(props: React.PropsWithChildren<ConfigRowProps>) {
+export default function ConfigRow(props: ConfigRowProps) {
+    const React = getReact();
+
     return (
-    <div className="x-settings-row">
-        <div className="x-settings-firstColumn">
-            {props.description !== undefined && <label htmlFor={props.id}>{props.description}</label>}
-            {props.help !== undefined && <HelpTooltip text={props.help}/>}
-            {props.showRevertButton && <RevertButton onClick={props.revertButtonCallback}/>}
+        <div className="x-settings-row">
+            <div className="x-settings-firstColumn">
+                {props.firstColumn}
+            </div>
+            <div className="x-settings-secondColumn">
+                {props.secondColumn}
+            </div>
         </div>
-        <div className="x-settings-secondColumn">
-            {props.children}
-        </div>
-    </div>
     )
 }

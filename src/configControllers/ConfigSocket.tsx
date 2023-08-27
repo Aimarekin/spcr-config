@@ -7,9 +7,6 @@ export default class ConfigSocket extends EventTarget {
     ) {
         super();
 
-        if (this.namespace._closed) {
-            throw new Error(`ConfigNamespace ${this.namespace.id} is closed and cannot be used!`);
-        }
         if (this.namespace.activeSockets[this.id]) {
             throw new Error(`ConfigSocket with id ${this.id} already exists! Do not create more than one class for the same setting.`);
         }

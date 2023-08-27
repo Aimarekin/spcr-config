@@ -2,8 +2,9 @@ import ConfigSocket from "./ConfigSocket";
 import type ConfigNamespace from "./ConfigNamespace";
 
 export default class ConfigStore<T> extends ConfigSocket {
-    _currentValue: T;
-    _isDefault: boolean;
+    private _hasLoaded: boolean = false;
+    private _currentValue: T | null = null;
+    private _isDefault: boolean | null = null;
 
     constructor(
         id: string,
@@ -11,17 +12,6 @@ export default class ConfigStore<T> extends ConfigSocket {
         public readonly defaultValue: T,
     ) {
         super(id, namespace);
-
-        const storedValue = this._getDeserializedStoredValue();
-        
-        if (storedValue === undefined) {
-            this._currentValue = defaultValue;
-            this._isDefault = true;
-        }
-        else {
-            this._currentValue = storedValue;
-            this._isDefault = false;
-        }
     }
 
     private _getDeserializedStoredValue(): T | undefined {
@@ -30,13 +20,7 @@ export default class ConfigStore<T> extends ConfigSocket {
             return this.defaultValue;
         }
 
-        const deserialized = this.deserializer(storedValue);
-        if (deserialized === undefined) {
-            return this.defaultValue;
-        }
-        return deserialized;
-
-        return storedValue;
+        return this.deserializer(storedValue);
     }
 
     deserializer(value: any): T | undefined {
@@ -48,7 +32,21 @@ export default class ConfigStore<T> extends ConfigSocket {
     }
 
     getValue(): T {
-        return this._currentValue;
+        if (!this._hasLoaded) {
+            const storedValue = this._getDeserializedStoredValue();
+        
+            if (storedValue === undefined) {
+                this._currentValue = this.defaultValue;
+                this._isDefault = true;
+            }
+            else {
+                this._currentValue = storedValue;
+                this._isDefault = false;
+            }
+            this._hasLoaded = true;
+        }
+
+        return this._currentValue as T;
     }
 
     setValue(value: T) {
@@ -57,8 +55,8 @@ export default class ConfigStore<T> extends ConfigSocket {
             return;
         }
 
-        const prevValue = this._currentValue;
-        const prevDefault = this._isDefault;
+        const prevValue = this.getValue();
+        const prevDefault = this.isUsingDefault();
 
         this._currentValue = value;
         this._isDefault = false;
@@ -73,8 +71,8 @@ export default class ConfigStore<T> extends ConfigSocket {
     }
 
     clearValue() {
-        const prevValue = this._currentValue;
-        const prevDefault = this._isDefault;
+        const prevValue = this.getValue();
+        const prevDefault = this.isUsingDefault();
 
         this._currentValue = this.defaultValue;
         this._isDefault = true;
@@ -89,6 +87,10 @@ export default class ConfigStore<T> extends ConfigSocket {
     }
 
     isUsingDefault() {
-        return this._isDefault;
+        if (!this._hasLoaded) {
+            this.getValue();
+        }
+
+        return this._isDefault as boolean;
     }
 }
