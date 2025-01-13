@@ -1,42 +1,48 @@
 import type ConfigNamespace from "./ConfigNamespace";
 
-export default class ConfigSocket extends EventTarget {
-    constructor(
-        readonly id: string,
-        private readonly namespace: ConfigNamespace,
-    ) {
-        super();
+import ListenerTarget from "../util/ListenerTarget";
+import SocketOccupiedError from "../util/errors/SocketOccupiedError";
 
-        if (this.namespace.activeSockets[this.id]) {
-            throw new Error(`ConfigSocket with id ${this.id} already exists! Do not create more than one class for the same setting.`);
-        }
+export type ConfigSocketEventMap<UsingThis> = {
+	storedValueChange: (this: UsingThis, value: any, prevValue: any) => void;
+};
 
-        this.namespace.activeSockets[this.id] = this;
-    }
+export default class ConfigSocket {
+	_listenerTarget: ListenerTarget<ConfigSocket, ConfigSocketEventMap<ConfigSocket>> = new ListenerTarget();
+	listenTo = this._listenerTarget.listenTo;
 
-    getValue(): any {
-        return this.namespace._getStored(this.id);
-    }
+	constructor(
+		readonly namespace: ConfigNamespace,
+		readonly id: string
+	) {
+		if (this.namespace.activeSockets[this.id]) {
+			throw new SocketOccupiedError(namespace.id, id);
+		}
 
-    setValue(value: any) {
-        const prevValue = this.getValue();
-        this.namespace._setStored(this.id, value);
+		this.namespace.activeSockets[this.id] = this;
+	}
 
-        if (prevValue !== value) {
-            this.dispatchEvent(new Event("storedValueChange"));
-        }
-    }
+	getValue(): any {
+		return this.namespace._getStored(this.id);
+	}
 
-    clearValue() {
-        const prevValue = this.getValue();
-        this.namespace._clearStored(this.id);
+	setValue(value: any) {
+		const prevValue = this.getValue();
+		this.namespace._setStored(this.id, value);
 
-        if (prevValue !== undefined) {
-            this.dispatchEvent(new Event("storedValueChange"));
-        }
-    }
+		this._listenerTarget.dispatch("storedValueChange", this, [value, prevValue]);
+	}
 
-    getFullName() {
-        return `${this.namespace.id}.${this.id}`;
-    }
+	clearValue() {
+		const prevValue = this.getValue();
+
+		if (prevValue !== undefined) {
+			this.namespace._clearStored(this.id);
+			this._listenerTarget.dispatch("storedValueChange", this, [undefined, prevValue]);
+		}
+	}
+
+	getFullName() {
+		return `${this.namespace.id}.${this.id}`;
+	}
 }

@@ -1,13 +1,12 @@
 import { getReactDOM } from "../reactUtil/reactLoader";
 
-export default function renderReactTree(tree: React.ReactElement, sortingName?: string): HTMLDivElement {
-    const settingsContainer = document.createElement("div");
-    settingsContainer.classList.add("spcr-config-container");
+export default function renderConfigReactTree(tree: React.ReactElement): HTMLDivElement {
+	const settingsContainer = document.createElement("div");
+	settingsContainer.classList.add("spcr-config-tree");
 
-    settingsContainer.dataset.sortingName = sortingName;
-    settingsContainer.dataset.sortingCreationTimestamp = Date.now().toString();
+	settingsContainer.dataset.sortingCreationTimestamp = Date.now().toString();
 
-    getReactDOM().render(tree, settingsContainer);
+	getReactDOM().render(tree, settingsContainer);
 
-    return settingsContainer;
+	return settingsContainer;
 }

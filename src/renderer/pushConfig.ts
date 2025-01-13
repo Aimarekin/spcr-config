@@ -1,58 +1,96 @@
-import elementBinder from "../util/elementBinder";
+import callbackOnSelectorFound from "../util/callbackOnSelectorFound";
+import { waitForSpicetify } from "../util/spicetifyLoader";
 
 import throwIfSpicetifyNotReady from "../util/throwIfSpicetifyNotReady";
 
-function generateDefaultSorterFunction(elm: HTMLElement) {
-    return (otherElm: HTMLElement) => {
-        if (!elm.dataset.sortingName || !otherElm.dataset.sortingName) {
-            return false;
-        }
+function generateDefaultSorterFunction(elm: Element) {
+	return (otherElm: Element) => {
+		if (!otherElm.classList.contains("spcr-config-tree")) {
+			return false;
+		}
 
-        switch (elm.dataset.sortingName.localeCompare(otherElm.dataset.sortingName)) {
-            case -1: {
-                return true;
-            }
-            case 1: {
-                return false;
-            }
-            case 0: {
-                if (!elm.dataset.sortingCreationTimestamp || !otherElm.dataset.sortingCreationTimestamp) {
-                    return false;
-                }
-                return parseInt(elm.dataset.sortingCreationTimestamp) < parseInt(otherElm.dataset.sortingCreationTimestamp);
-            }
-        }
-    }
+		const elmName = elm.getElementsByClassName("spcr-config-header-extension-name")[0]?.textContent?.trim();
+		// eslint-disable-next-line prettier/prettier
+		const otherElmName = otherElm.getElementsByClassName("spcr-config-header-extension-name")[0]?.textContent?.trim();
+		if (!(elmName && otherElmName)) {
+			return false;
+		}
+
+		switch (elmName.localeCompare(otherElmName)) {
+			case -1: {
+				return true;
+			}
+			case 1: {
+				return false;
+			}
+			case 0: {
+				if (!(elm instanceof HTMLElement && otherElm instanceof HTMLElement)) {
+					return false;
+				}
+
+				if (!(elm.dataset.sortingCreationTimestamp && otherElm.dataset.sortingCreationTimestamp)) {
+					return false;
+				}
+				return (
+					parseInt(elm.dataset.sortingCreationTimestamp) < parseInt(otherElm.dataset.sortingCreationTimestamp)
+				);
+			}
+		}
+	};
 }
 
-export default function pushConfig(elm: HTMLElement, sorterFunction: (otherElm: HTMLElement) => boolean = generateDefaultSorterFunction(elm)): () => void {
-    throwIfSpicetifyNotReady("pushConfig() can only be called after Spicetify has loaded.")
+export default function pushConfig(
+	elm: Element,
+	sorterFunction: (otherElm: Element) => boolean = generateDefaultSorterFunction(elm)
+): () => void {
+	let hasCancelledWhileSpicetifyLoading = false;
+	let unbind = () => {
+		hasCancelledWhileSpicetifyLoading = true;
+	};
 
-    const { bind: bindConfig, unbind: unbindConfig } = elementBinder(elm);
+	waitForSpicetify().then(() => {
+		if (hasCancelledWhileSpicetifyLoading) {
+			return;
+		}
 
-    console.log("RENDERED CONFIG", elm);
+		let unbindToPreferences = () => {};
 
-    function bindToPreferences() {
-        console.log("BINDED TO PREFS!");
-        bindConfig("main > .x-settings-container", document.querySelector(".main-view-container")!);
-    }
+		function bindToPreferences() {
+			unbindToPreferences = callbackOnSelectorFound(
+				"main > .x-settings-container",
+				(foundElm) => {
+					for (const child of Array.from(foundElm.children)) {
+						if (!sorterFunction(child)) {
+							foundElm.insertBefore(elm, child);
+							return;
+						}
+					}
+					foundElm.appendChild(elm);
+				},
+				document.querySelector(".main-view-container") || document.documentElement
+			);
+		}
 
-    if (Spicetify.Platform.History.location === "/preferences") {
-        bindToPreferences();
-    }
+		if (Spicetify.Platform.History.location === "/preferences") {
+			bindToPreferences();
+		}
 
-    const cancelHistoryListener = Spicetify.Platform.History.listen((location: any) => {
-        console.log("LISTENED!", location)
-        if (location.pathname !== "/preferences") {
-            elm.remove();
-            return
-        }
-        bindToPreferences();
-    });
+		const cancelHistoryListener = Spicetify.Platform.History.listen((location: any) => {
+			if (location.pathname !== "/preferences") {
+				elm.remove();
+				return;
+			}
+			bindToPreferences();
+		});
 
-    return () => {
-        cancelHistoryListener();
-        unbindConfig();
-        elm.remove();
-    }
+		unbind = () => {
+			cancelHistoryListener();
+			unbindToPreferences();
+			elm.remove();
+		};
+	});
+
+	return () => {
+		unbind();
+	};
 }

@@ -1,36 +1,37 @@
-import { getReact, getSpicetifyReactComponent } from "../../reactLoader"
+import { getReact, getSpicetifyReactComponent } from "../../reactLoader";
 
-import HelpIcon from "../../icons/HelpIcon"
+import HelpIcon from "../../icons/HelpIcon";
 
 export type HelpTooltipProps = {
-    label?: React.ReactNode,
-    placement?:
-        | "top"    | "top-start"    | "top-end"
-        | "bottom" | "bottom-start" | "bottom-end"
-        | "left"   | "left-start"   | "left-end"
-        | "right"  | "right-start"  | "right-end"
-        | "auto"   | "auto-start"   | "auto-end",
-    labelClassName?: string,
-}
+	label?: React.ReactNode;
+	/* eslint-disable prettier/prettier */
+	placement?:
+		| "top"    | "top-start"    | "top-end"
+		| "bottom" | "bottom-start" | "bottom-end"
+		| "left"   | "left-start"   | "left-end"
+		| "right"  | "right-start"  | "right-end"
+		| "auto"   | "auto-start"   | "auto-end",
+	/* eslint-enable prettier/prettier */
+	labelClassName?: string;
+};
 
 export default function HelpTooltip(props: HelpTooltipProps) {
-    const React = getReact(), ReactComponent = getSpicetifyReactComponent();
+	const React = getReact(),
+		ReactComponent = getSpicetifyReactComponent();
 
-    return (
-        <div className="x-settings-tooltip">
-            <ReactComponent.TooltipWrapper
-                label = {props.label}
-                renderInline = {true}
-                showDelay = {0}
-                placement = {props.placement || "top"}
-                labelClassName = {props.labelClassName}
-            >
-                <div
-                    className="x-settings-tooltipIconWrapper"
-                >
-                    <HelpIcon/>
-                </div>
-            </ReactComponent.TooltipWrapper>
-        </div>
-    )
+	return (
+		<div className="x-settings-tooltip">
+			<ReactComponent.TooltipWrapper
+				label={props.label}
+				renderInline={true}
+				showDelay={0}
+				placement={props.placement || "top"}
+				labelClassName={props.labelClassName}
+			>
+				<div className="x-settings-tooltipIconWrapper">
+					<HelpIcon />
+				</div>
+			</ReactComponent.TooltipWrapper>
+		</div>
+	);
 }

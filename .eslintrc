@@ -9,12 +9,12 @@
 	},
 	"ignorePatterns": [
 		"/dist",
-        "/node_modules",
-        "spicetify.d.ts"
+		"/node_modules",
+		"spicetify.d.ts"
 	],
 	"env": {
 		"browser": true,
-		"es2015": true 
+		"es2015": true
 	},
 	"plugins": [
 		"@typescript-eslint",
@@ -27,11 +27,26 @@
 		"plugin:@typescript-eslint/recommended",
 		"plugin:prettier/recommended"
 	],
+	"settings": {
+		"react": {
+			"version": "17.0.2"
+		}
+	},
 	"rules": {
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/ban-types": [
+			"error",
+			{
+				"extendDefaults": true,
+				"types": {
+					"{}": false
+				}
+			}
+		],
 		"prettier/prettier": [
 			"warn",
 			{
-				"printWidth": 80,
+				"printWidth": 120,
 				"tabWidth": 4,
 				"trailingComma": "none",
 				"useTabs": true,

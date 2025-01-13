@@ -1,19 +1,24 @@
+/* eslint-disable prettier/prettier */
+
 /* SPICETIFY WAITER */
 export { isSpicetifyReady, waitForSpicetify } from "./util/spicetifyLoader";
 
 /* REACT LOADER */
-export { getReact, getReactDOM, getSpicetifyReactComponent, overrideReact, overrideReactDOM, overrideSpicetifyReactComponent } from "./reactUtil/reactLoader";
+export {
+	overrideReact,
+	overrideReactDOM,
+	overrideSpicetifyReactComponent
+} from "./reactUtil/reactLoader";
 
 /* CONFIG CONTROLLERS */
 export { default as ConfigNamespace } from "./configControllers/ConfigNamespace";
 export { default as ConfigSocket } from "./configControllers/ConfigSocket";
-export { default as ConfigStore } from "./configControllers/ConfigStore";
+export { default as ConfigStore } from "./configControllers/configStores/ConfigStore";
 
-export { default as ConfigField } from "./configControllers/configFields/ConfigField";
-export { default as ConfigFieldDropdown } from "./configControllers/configFields/ConfigFieldDropdown";
-export { default as ConfigFieldNumber } from "./configControllers/configFields/ConfigFieldNumber";
-export { default as ConfigFieldText } from "./configControllers/configFields/ConfigFieldText";
-export { default as ConfigFieldToggle } from "./configControllers/configFields/ConfigFieldToggle";
+export { default as ConfigStoreBoolean } from "./configControllers/configStores/ConfigStoreBoolean";
+export { default as ConfigStoreEnum } from "./configControllers/configStores/ConfigStoreEnum";
+export { default as ConfigStoreNumber } from "./configControllers/configStores/ConfigStoreNumber";
+export { default as ConfigStoreString } from "./configControllers/configStores/ConfigStoreString";
 
 /* REACT COMPONENTS */
 export { default as ConfigDisplayDropdown, ConfigDisplayDropdownProps } from "./reactUtil/components/configDisplay/ConfigDisplayDropdown";

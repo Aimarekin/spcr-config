@@ -1,13 +1,14 @@
 {
-  "compilerOptions": {
-    "module": "ESNext",
-    "target": "ES2015",
-    "lib": ["ES2015", "DOM"],
-    "outDir": "dist",
-    "declaration": true,
-    "sourceMap": true,
-    "rootDir": "src",
-    "jsx": "react",
-  },
-  "include": [ "src/**/*" ]
+	"compilerOptions": {
+		"module": "ESNext",
+		"target": "ES2015",
+		"lib": ["ES2015", "DOM"],
+		"moduleResolution": "node",
+		"outDir": "dist",
+		"declaration": true,
+		"sourceMap": true,
+		"rootDir": "src",
+		"jsx": "react"
+	},
+	"include": [ "src/**/*" ]
 }

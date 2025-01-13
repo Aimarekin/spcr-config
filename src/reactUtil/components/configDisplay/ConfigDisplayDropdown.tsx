@@ -7,25 +7,24 @@ import ConfigRowStandardFirstColumn, { ConfigRowStandardFirstColumnProps } from 
 export type ConfigDisplayDropdownProps<T extends string> = ConfigRowStandardFirstColumnProps & InputDropdownProps<T>;
 
 export default function ConfigDisplayDropdown<T extends string>(props: ConfigDisplayDropdownProps<T>) {
-    const React = getReact();
+	const React = getReact();
 
-    return (
-        <ConfigRow
-            firstColumn={<ConfigRowStandardFirstColumn
-                id={props.id}
-                title={props.title}
-                postTitle={props.postTitle}
-                description={props.description}
-                help={props.help}
-                showRevertButton={props.showRevertButton}
-                revertButtonCallback={props.revertButtonCallback}
-            />}
-            secondColumn={<InputDropdown
-                id={props.id}
-                value={props.value}
-                options={props.options}
-                onChange={props.onChange}
-            />}
-        />
-    )
+	return (
+		<ConfigRow
+			firstColumn={
+				<ConfigRowStandardFirstColumn
+					id={props.id}
+					title={props.title}
+					postTitle={props.postTitle}
+					description={props.description}
+					help={props.help}
+					showRevertButton={props.showRevertButton}
+					revertButtonCallback={props.revertButtonCallback}
+				/>
+			}
+			secondColumn={
+				<InputDropdown id={props.id} value={props.value} options={props.options} onChange={props.onChange} />
+			}
+		/>
+	);
 }

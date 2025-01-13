@@ -4,65 +4,54 @@ import ConfigField from "./ConfigField";
 import type ConfigNamespace from "../ConfigNamespace";
 
 import ConfigDisplayText, { ConfigDisplayTextProps } from "../../reactUtil/components/configDisplay/ConfigDisplayText";
-import useFieldFactoryHooks from "../../reactUtil/useFieldFactoryHooks";
+import useConfigState from "../../reactUtil/useConfigState";
 
 export type ConfigFieldTextProps = {
-    defaultValue: string;
+	defaultValue: string;
 };
 
-export type ConfigFieldTextDisplayProps = Pick<ConfigDisplayTextProps, "value" | "onChange" | "showRevertButton" | "revertButtonCallback">;
+export type ConfigFieldTextDisplayProps = Required<
+	Pick<ConfigDisplayTextProps, "id" | "value" | "onChange" | "showRevertButton" | "revertButtonCallback">
+>;
 
 export type ConfigFieldTextFactoryProps = Omit<ConfigDisplayTextProps, keyof ConfigFieldTextDisplayProps>;
 
 export default class ConfigFieldText extends ConfigField<string> {
-    readonly ReactComponent = ConfigDisplayText;
-    readonly ReactFactory;
+	readonly ReactComponent = ConfigDisplayText;
+	readonly ReactFactory: (factoryProps: ConfigFieldTextFactoryProps) => JSX.Element;
 
-    constructor (
-        id: string,
-        namespace: ConfigNamespace,
-        props: ConfigFieldTextProps
-    ) {
-        const { defaultValue } = props;
-        
-        super(id, namespace, defaultValue);
+	constructor(id: string, namespace: ConfigNamespace, props: ConfigFieldTextProps) {
+		const { defaultValue } = props;
 
-        this.ReactFactory = (factoryProps: ConfigFieldTextFactoryProps) => {
-            useFieldFactoryHooks(this);
+		super(id, namespace, defaultValue);
 
-            return getReact().createElement(this.ReactComponent, this.transformProps(this.getCurrentDisplayProps(), factoryProps));
-        }
-    }
+		this.ReactFactory = (factoryProps: ConfigFieldTextFactoryProps) => {
+			useConfigState(this);
 
-    deserializer(value: any): string {
-        return String(value);
-    }
+			return getReact().createElement(this.ReactComponent, { ...this.getCurrentDisplayProps(), ...factoryProps });
+		};
+	}
 
-    serializer(value: string): string {
-        return String(value);
-    }
+	deserializer(value: any): string {
+		return String(value);
+	}
 
-    getCurrentDisplayProps(): ConfigFieldTextDisplayProps {
-        return {
-            value: this.getValue(),
-            onChange: (value: string) => {
-                const v = this.deserializer(value);
-                if (v !== undefined) {
-                    this.setValue(v);
-                }
-            },
-            showRevertButton: this.isUsingDefault(),
-            revertButtonCallback: () => this.clearValue()
-        }
-    }
+	serializer(value: string): string {
+		return String(value);
+	}
 
-    transformProps(
-        currentDisplayProps: ConfigFieldTextDisplayProps,
-        factoryProps: ConfigFieldTextFactoryProps
-    ): ConfigDisplayTextProps {
-        return {
-            ...currentDisplayProps,
-            ...factoryProps
-        }
-    }
+	getCurrentDisplayProps(): ConfigFieldTextDisplayProps {
+		return {
+			id: this.getFullName(),
+			value: this.getValue(),
+			onChange: (value: string) => {
+				const v = this.deserializer(value);
+				if (v !== undefined) {
+					this.setValue(v);
+				}
+			},
+			showRevertButton: this.isUsingDefault(),
+			revertButtonCallback: () => this.clearValue()
+		};
+	}
 }

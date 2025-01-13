@@ -1,29 +1,31 @@
 {
-  "name": "spcr-config",
-  "version": "0.0.4",
-  "description": "Settings module for Spicetify Creator plugins inspired by spcr-settings",
-  "license": "CC-BY-NC-4.0",
-  "author": "Aimarekin <aimarekin@gmail.com>",
-  "repository": "github:Aimarekin/spcr-config",
-  "private": false,
-  "publishConfig": {
-    "access": "public"
-  },
-  "main": "dist/index.js",
-  "files": [
-    "dist/"
-  ],
-  "scripts": {
-    "build": "tsc"
-  },
-  "devDependencies": {
-    "@types/node": "^20.4.10",
-    "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2",
-    "csstype": "^3.1.2",
-    "eslint": "8.48.0",
-    "eslint-config-prettier": "9.0.0",
-    "eslint-plugin-prettier": "5.0.0",
-    "prettier": "3.0.2"
-  }
+	"name": "spcr-config",
+	"version": "0.0.4",
+	"description": "Settings module for Spicetify Creator plugins inspired by spcr-settings",
+	"license": "CC-BY-NC-4.0",
+	"author": "Aimarekin <aimarekin@gmail.com>",
+	"repository": "github:Aimarekin/spcr-config",
+	"private": false,
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "dist/index.js",
+	"files": [
+		"dist/"
+	],
+	"scripts": {
+		"build": "tsc"
+	},
+	"dependencies": {
+		"@types/react": "17.0.2",
+		"@types/react-dom": "17.0.2"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "6.4.1",
+		"eslint": "8.48.0",
+		"eslint-config-prettier": "9.0.0",
+		"eslint-plugin-prettier": "5.0.0",
+		"eslint-plugin-react": "7.33.2",
+		"prettier": "3.0.2"
+	}
 }
